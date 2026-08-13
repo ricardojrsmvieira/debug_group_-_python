@@ -1,0 +1,42 @@
+[build-system]
+requires = ["uv_build >= 0.11.29, < 0.12"]
+build-backend = "uv_build"
+
+
+[project]
+name = "debug_group"
+description = "Python library to make debug prints easier to group, easier to read, and easier to turn on and off several prints by changing a single flag."
+version = "0.1.0"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+authors = [
+    { name = "Ricardo JRSM Vieira", email = "ricardojrsmvieira@gmail.com" }
+]
+maintainers = [
+    { name = "Ricardo JRSM Vieira", email = "ricardojrsmvieira@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Printing",
+    "Topic :: Terminals",
+    "Typing :: Typed"
+]
+requires-python = ">= 3.12"
+dependencies = []
+
+
+[dependency-groups]
+dev = [
+    "ruff >= 0.15.22, < 0.16",
+    "pyright[nodejs] >= 1.1.411, < 1.2",
+    "pip-audit >= 2.10.1, < 2.11"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/ricardojrsmvieira/debug_group_-_python"
+Issues = "https://github.com/ricardojrsmvieira/debug_group_-_python/issues"

@@ -1,0 +1,27 @@
+name: Publish to PyPI
+
+on: workflow_dispatch
+
+concurrency:
+  group: pypi_publish
+  cancel-in-progress: true
+
+jobs:
+  build_and_publish:
+    name: Build and publish 📦
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+      contents: read
+    environment:
+      name: pypi
+      url: https://pypi.org/p/debug_group
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        persist-credentials: false
+    - name: Build and publish to PyPI
+      uses: ./.github/actions/build_and_publish

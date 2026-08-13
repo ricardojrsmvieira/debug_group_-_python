@@ -1,0 +1,19 @@
+name: Build 📦
+
+runs:
+  using: composite
+  steps:
+    - name: Set up the machine
+      uses: ./.github/actions/setup
+
+    - name: Build a binary wheel and a source tarball
+      shell: bash
+      run: |
+        uv build --no-sources
+        rm -f dist/.gitignore
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v5
+      with:
+        name: python-package-distributions
+        path: dist/

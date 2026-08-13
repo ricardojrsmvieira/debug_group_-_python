@@ -1,0 +1,17 @@
+name: Build and publish 📦
+
+inputs:
+  test:
+    required: false
+    type: boolean
+    default: false
+
+runs:
+  using: composite
+  steps:
+    - name: Build
+      uses: ./.github/actions/build
+    - name: Publish
+      uses: ./.github/actions/publish
+      with:
+        test: ${{ inputs.test }}

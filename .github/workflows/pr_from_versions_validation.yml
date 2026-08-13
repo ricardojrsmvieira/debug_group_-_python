@@ -1,0 +1,33 @@
+name: Pull Request from Versions Validation
+
+on:
+  pull_request:
+
+jobs:
+  check_is_version_branch:
+    name: Check if the branch is a version branch
+    runs-on: ubuntu-latest
+    outputs:
+      is_version_branch: ${{ steps.check_is_version_branch.outputs.is_version_branch }}
+    steps:
+      - id: check_is_version_branch
+        name: Check if the branch is a version branch
+        run: |
+          if [[ "${{ github.head_ref }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "is_version_branch=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_version_branch=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  check_version_branch_points_to_main:
+    name: Check if the version branch points to main
+    runs-on: ubuntu-latest
+    needs: check_is_version_branch
+    if: needs.check_is_version_branch.outputs.is_version_branch == 'true'
+    steps:
+      - name: Check if the version branch points to main
+        run: |
+          if [[ ! "${{ github.base_ref }}" =~ "main" ]]; then
+            echo "The version branch must point to main."
+            exit 1
+          fi

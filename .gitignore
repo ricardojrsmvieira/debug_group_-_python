@@ -1,0 +1,10 @@
+**/__pycache__
+dist
+.env
+.DS_Store
+.ruff_cache
+.venv
+
+
+# DO NOT IGNORE INSIDE:
+!.vscode/extensions/**

@@ -1,0 +1,103 @@
+name: Lint
+
+on: push
+
+
+jobs:
+  setup:
+    name: Check uv.lock file and cache environment setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up the machine
+        uses: ./.github/actions/setup
+
+      - name: Check uv.lock file
+        run: uv lock --check
+
+      - name: Install and cache dependencies
+        run: uv sync
+
+
+  linter:
+    name: Ruff Linter
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup the machine
+        uses: ./.github/actions/setup
+
+      - name: Run linter
+        run: uv run --frozen ruff check
+
+
+  dependencies_audit:
+    name: Pip Audit
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup the machine
+        uses: ./.github/actions/setup
+
+      - name: Run dependencies audit
+        run: uv run --frozen pip-audit --desc
+
+
+  type-checker:
+    name: Pyright Type Checker
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup the machine
+        uses: ./.github/actions/setup
+
+      - name: Run type checker
+        run: |
+          export PYRIGHT_PYTHON_PYLANCE_VERSION=latest-release
+          uv run --frozen pyright
+
+
+  type-completeness:
+    name: Pyright Type Completeness Checker
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup the machine
+        uses: ./.github/actions/setup
+
+      - name: Run type completeness checker
+        run: |
+          export PYRIGHT_PYTHON_PYLANCE_VERSION=latest-release
+          score=$(uv run --frozen pyright --verifytypes debug_group | grep "Type completeness score:" | awk '{print $4}')
+          echo "Type completeness is $score"
+          if [ "$score" = "100%" ]; then
+              echo "Type completeness is 100%, exiting with success."
+              exit 0
+          else
+              echo "Type completeness is not 100%, exiting with failure."
+              exit 1
+          fi

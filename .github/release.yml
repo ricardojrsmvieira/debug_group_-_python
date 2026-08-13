@@ -1,0 +1,15 @@
+changelog:
+  exclude:
+    labels:
+      - relnotes-ignore
+      - documentation
+  categories:
+    - title: Breaking Changes 💥
+      labels:
+        - relnotes-breaking
+    - title: New Features 🎉
+      labels:
+        - relnotes-feature
+    - title: Bug Fixes 🛠
+      labels:
+        - relnotes-bugfix

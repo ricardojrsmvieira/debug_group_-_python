@@ -1,0 +1,39 @@
+name: Publish 📦
+
+inputs:
+  test:
+    required: false
+    type: boolean
+    default: false
+
+runs:
+  using: composite
+  steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v6
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Attest the distribution packages (GitHub Attestations) 🔏
+      uses: actions/attest@v4
+      with:
+        subject-path: dist/
+
+    - name: Attest the distribution packages (PyPI Attestations) 🔏
+      shell: bash
+      run: uvx pypi-attestations sign dist/*
+
+    - name: Publish distribution 📦 to ${{ inputs.test && 'Test PyPI' || 'PyPI' }}
+      shell: bash
+      run: |
+        if [[ "${{ inputs.test }}" == "true" ]]; then
+          uv publish --index test_pypi
+        else
+          uv publish
+        fi
+
+    - name: Minimize uv cache
+      if: ${{ always() }}
+      shell: bash
+      run: uv cache prune --ci
