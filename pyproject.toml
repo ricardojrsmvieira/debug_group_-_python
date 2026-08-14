@@ -6,7 +6,7 @@ build-backend = "uv_build"
 [project]
 name = "debug_group"
 description = "Python library to make debug prints easier to group, easier to read, and easier to turn on and off several prints by changing a single flag."
-version = "0.1.0"
+version = "0.0.1"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
@@ -25,8 +25,11 @@ classifiers = [
     "Topic :: Terminals",
     "Typing :: Typed"
 ]
-requires-python = ">= 3.12"
-dependencies = []
+requires-python = ">= 3.13"
+dependencies = [
+    "escansi ~= 0.1",
+    "pydantic ~= 2.13.4",
+]
 
 
 [dependency-groups]
