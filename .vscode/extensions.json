@@ -9,7 +9,6 @@
         // PYTHON
         "ms-python.python",
         "ms-python.vscode-pylance",
-        "ms-pyright.pyright",
         "charliermarsh.ruff",
 
         // TOML
@@ -23,6 +22,8 @@
         // PYTHON
         // Installed by default with the Python extension, but we don't use it.
         "ms-python.debugpy",
-        "ms-python.vscode-python-envs"
+        "ms-python.vscode-python-envs",
+        // Conflicts with Pylance that already comes with the functionality of Pyright.
+        "ms-pyright.pyright"
     ]
 }
