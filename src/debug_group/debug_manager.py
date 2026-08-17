@@ -84,36 +84,37 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
 
     group_configs = configs.get('group_configs', {})
 
-    for group_name in get_args(cls.__pydantic_generic_metadata__['args'][0]):
-      if group_name not in group_configs:
-        group_configs[group_name] = DEFAULT_GROUP_CONFIG.copy()
+    type_args = cls.__pydantic_generic_metadata__['args']
+    if (type_args and type_args[0] is not str):
+      for group_name in get_args(type_args[0]):
+        if group_name not in group_configs:
+          group_configs[group_name] = DEFAULT_GROUP_CONFIG.copy()
 
-    for group_name, group_config in group_configs.items():
-      if isinstance(group_config, dict):
-        group_configs[group_name] = { **DEFAULT_GROUP_CONFIG, **group_config }
+      for group_name, group_config in group_configs.items():
+        if isinstance(group_config, dict):
+          group_configs[group_name] = { **DEFAULT_GROUP_CONFIG, **group_config }
 
-    for group_name, group_config in group_configs.items():
-      if isinstance(group_config, str):
-        if group_config not in group_configs:
-          msg = (f"Debug group '{group_name}' is configured as a copy of '{group_config}', "
-                f"but no configs were found for the latter. "
-                f"Please make sure all copies point to an existing group.")
-          raise ValueError(msg)
-        if isinstance(group_configs[group_config], str):
-          msg = (f"Debug group '{group_name}' configs are configured as a copy of '{group_config}',"
-                f" but the latter is also configured as a copy. "
-                f"Please make sure all copies point to a non-copy group.")
-          raise TypeError(msg)
-        # We can safely copy the configs, since we know that the group it's copying from is not a
-        # copy itself and has all the necessary configs (either default or user-defined)
-        group_configs[group_name] = group_configs[group_config].copy() # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
+      for group_name, group_config in group_configs.items():
+        if isinstance(group_config, str):
+          if group_config not in group_configs:
+            msg = (f"Debug group '{group_name}' is configured as a copy of '{group_config}', "
+                  f"but no configs were found for the latter. "
+                  f"Please make sure all copies point to an existing group.")
+            raise ValueError(msg)
+          if isinstance(group_configs[group_config], str):
+            msg = (f"Debug group '{group_name}' configs are configured as a copy of '{group_config}',"
+                  f" but the latter is also configured as a copy. "
+                  f"Please make sure all copies point to a non-copy group.")
+            raise TypeError(msg)
+          # We can safely copy the configs, since we know that the group it's copying from is not a
+          # copy itself and has all the necessary configs (either default or user-defined)
+          group_configs[group_name] = group_configs[group_config].copy() # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType]
 
     group_configs_final: dict[DebugGroupNameT, FinalDebugGroupConfigType] = group_configs # pyright: ignore[reportAssignmentType]
-    for group_name, group_config in group_configs_final.items():
-      group_config['is_on'] = (
-        group_name in configs.get('debugs_on', DEFAULT_DEBUG_SETTINGS['debugs_on'])
-      )
-
+    for group_name in configs.get('debugs_on', DEFAULT_DEBUG_SETTINGS['debugs_on']):
+      if group_name not in group_configs_final:
+        group_configs_final[group_name] = DEFAULT_GROUP_CONFIG.copy() # pyright: ignore[reportArgumentType]
+      group_configs_final[group_name]['is_on'] = True # pyright: ignore[reportArgumentType]
 
     cls.DEBUG_SETTINGS['max_chars_per_line'] = configs.get('max_chars_per_line',
                                                            DEFAULT_DEBUG_SETTINGS['max_chars_per_line'])
@@ -143,7 +144,9 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
   ) -> 'DebugManager.DebugGroup[DebugGroupNameT]':
     """Create a new debug group with the provided name and configuration."""
     return DebugManager.DebugGroup[DebugGroupNameT](
-      name, group_name, config,
+      name,
+      group_name,
+      config,
       debug_manager_settings = self.DEBUG_SETTINGS,
       none_debug_group = self.NONE_DEBUG_GROUP
     )
@@ -200,8 +203,9 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
       debug_manager_settings: FinalDebugSettingsType[T],
       none_debug_group: 'DebugManager.NoneDebugGroup[T]'
     ) -> 'Self | DebugManager.NoneDebugGroup[T]':
+      group = debug_manager_settings['group_configs'].get(group_name)
       if (group_name != '__NONE_CATEGORY_DG__'
-          and not debug_manager_settings['group_configs'][group_name]['is_on']):
+          and (group is None or not group['is_on'])):
         return none_debug_group
 
       return super().__new__(cls)
