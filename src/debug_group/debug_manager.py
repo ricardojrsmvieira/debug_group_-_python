@@ -263,9 +263,9 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
     @override
     def model_post_init(self, _context: Any) -> None:
       print( # noqa: T201 # This package is for debugging purposes, so we want to print to stdout.
-        self.indentation[:-1] +
-        format_text('bold') +
-        f'========> Starting debug group: {self.name} <======='
+        self.indentation[:-1]
+        + format_text('bold')
+        + f'========> Starting debug group: {self.name} <======='
         + reset_formats()
       )
       # We know the str is only for the NoneDebugGroup, which is never getting here
@@ -394,7 +394,7 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
         while len(final_line) > max_length and ' ' in final_line[max_length:]:
           line_to_add, rest = final_line[:max_length].rsplit(' ', 1)
           final_text += f'{before_text}{internal_indentation}{line_to_add}\n'
-          final_line = f'{left_spaces}{rest}{line[max_length:]}'
+          final_line = f'{left_spaces}{rest}{final_line[max_length:]}'
 
         final_text += f'{before_text}{internal_indentation}{final_line}\n'
 
@@ -446,9 +446,10 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
     def end(self) -> None:
       """End the current debug group and print the closing message."""
       print( # noqa: T201 # This package is for debugging purposes, so we want to print to stdout.
-        self.indentation[:-1] +
-        format_text('bold') +
-        reset_formats()
+        self.indentation[:-1]
+        + format_text('bold')
+        + f'========> Ending debug group: {self.name} <======='
+        + reset_formats()
       )
       if DebugManager.current_groups[-1] is self:
         _ = DebugManager.current_groups.pop()
