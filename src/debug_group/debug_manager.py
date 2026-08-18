@@ -77,7 +77,7 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
 
   #region New + Init + Post Init + Validators Methods
   @override
-  def __new__(cls, configs: DebugSettingsType[DebugGroupNameT]) -> Self:  # noqa: C901
+  def __new__(cls, configs: DebugSettingsType[DebugGroupNameT]) -> Self:  # noqa: C901, PLR0912
     if cls._instance is not None:
       return cls._instance # pyright: ignore[reportReturnType] # We know here is no longer None
 
@@ -113,8 +113,8 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
                   f"Please make sure all copies point to an existing group.")
             raise ValueError(msg)
           if isinstance(group_configs[group_config], str):
-            msg = (f"Debug group '{group_name}' configs are configured as a copy of '{group_config}',"
-                  f" but the latter is also configured as a copy. "
+            msg = (f"Debug group '{group_name}' configs are configured as a copy of "
+                  f"'{group_config}', but the latter is also configured as a copy. "
                   f"Please make sure all copies point to a non-copy group.")
             raise TypeError(msg)
           # We can safely copy the configs, since we know that the group it's copying from is not a
@@ -133,6 +133,8 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
     cls.DEBUG_SETTINGS['group_configs'] = group_configs_final
 
     cls._instance = super().__new__(cls) # pyright: ignore[reportAttributeAccessIssue] # We know we can
+    # This way we guarantee that the instance is created only once, even if the class is subclassed
+    DebugManager._instance = cls._instance
     return cls._instance # pyright: ignore[reportReturnType] # We know here is no longer None
 
 
