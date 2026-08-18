@@ -5,6 +5,7 @@ from .types import DebugGroupConfigType, FinalDebugSettingsType
 
 
 DEFAULT_GROUP_CONFIG: DebugGroupConfigType = {
+  'is_on': False,
   'fore_color': 'default',
   'back_color': 'default',
   'style': None,

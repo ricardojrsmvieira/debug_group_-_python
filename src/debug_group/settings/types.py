@@ -10,6 +10,7 @@ from escansi import FormatNameType
 # IMPORTANT: Whatever you add to one, add to the other ->
 class DebugGroupConfigType(TypedDict, total = False):
   """Debug group configuration type."""
+  is_on: bool
   fore_color: str | tuple[int, int, int] | int
   back_color: str | tuple[int, int, int] | int
   style: None | FormatNameType | tuple[FormatNameType, ...]
