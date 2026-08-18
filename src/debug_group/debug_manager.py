@@ -78,9 +78,20 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
   #region New + Init + Post Init + Validators Methods
   @override
   def __new__(cls, configs: DebugSettingsType[DebugGroupNameT]) -> Self:  # noqa: C901
-    # ---> Local imports <--- #
     if cls._instance is not None:
       return cls._instance # pyright: ignore[reportReturnType] # We know here is no longer None
+
+    # This happens when the class if is being initialized without any subclassing, so we need to set
+    # the class variables here, since __init_subclass__ is not called in this case.
+    if not getattr(cls, 'DEBUG_SETTINGS', None):
+      cls.DEBUG_SETTINGS: FinalDebugSettingsType[DebugGroupNameT] = DEFAULT_DEBUG_SETTINGS.copy() # pyright: ignore[reportAttributeAccessIssue]
+      cls.NONE_DEBUG_GROUP: DebugManager.NoneDebugGroup[DebugGroupNameT] = (
+        DebugManager.NoneDebugGroup[DebugGroupNameT](name = 'None',
+                                                     group_name = '__NONE_CATEGORY_DG__', # pyright: ignore[reportArgumentType]
+                                                     debug_manager_settings = cls.DEBUG_SETTINGS,
+                                                     none_debug_group = None) # pyright: ignore[reportArgumentType]
+      )
+      cls.MyDebugGroup = cls.DebugGroup[DebugGroupNameT]
 
     group_configs = configs.get('group_configs', {})
 
