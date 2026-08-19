@@ -6,7 +6,7 @@ build-backend = "uv_build"
 [project]
 name = "debug_group"
 description = "Python library to make debug prints easier to group, easier to read, and easier to turn on and off several prints by changing a single flag."
-version = "0.0.7"
+version = "0.0.8"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICEN[CS]E*"]

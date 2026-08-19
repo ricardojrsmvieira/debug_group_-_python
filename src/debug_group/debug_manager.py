@@ -408,8 +408,18 @@ class DebugManager[DebugGroupNameT: str = str](BaseModel):
         else:
           final_line = f'{PARAGRAPH_INDENTATION_TEXT}{line}'
 
-        while len(final_line) > max_length and ' ' in final_line[max_length:]:
-          line_to_add, rest = final_line[:max_length].rsplit(' ', 1)
+        while len(final_line) > max_length and ' ' in final_line:
+          if ' ' in final_line[:max_length]:
+            separated = final_line[:max_length].rsplit(' ', 1)
+          else:
+            separated = final_line.split(' ', 1)
+
+          if len(separated) == 1:
+            line_to_add = separated[0]
+            rest = ''
+          else:
+            line_to_add, rest = separated
+
           final_text += f'{before_text}{internal_indentation}{line_to_add}\n'
           final_line = f'{left_spaces}{rest}{final_line[max_length:]}'
 
